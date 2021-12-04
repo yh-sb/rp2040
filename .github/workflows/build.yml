@@ -1,0 +1,42 @@
+name: build
+
+on: [push, pull_request]
+
+env:
+  GCC_ARM_NONE_EABI_VERSION: 10.3-2021.10
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install dependencies
+        run: |
+            [System.Net.WebClient]::new().downloadFile("https://developer.arm.com/-/media/Files/downloads/gnu-rm/$Env:GCC_ARM_NONE_EABI_VERSION/gcc-arm-none-eabi-$Env:GCC_ARM_NONE_EABI_VERSION-win32.zip", "gcc-arm-none-eabi-win32.zip")
+            [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\") | Remove-Item
+            echo "C:\gcc-arm-none-eabi-$Env:GCC_ARM_NONE_EABI_VERSION\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Checkout with submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Build
+        run: make
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+            wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/$GCC_ARM_NONE_EABI_VERSION/gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2
+            sudo tar xjf gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2 -C /usr/share/
+            rm gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2
+            echo "/usr/share/gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION/bin" >> $GITHUB_PATH
+
+      - name: Checkout with submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Build
+        run: make
