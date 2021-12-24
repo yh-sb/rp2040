@@ -20,4 +20,6 @@ make debug - Upload firmware to the target and start the debug session
 ## Requirements
 * [GNU Arm Embedded Toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 * [CMake](https://cmake.org/download)
-* [Make](http://gnuwin32.sourceforge.net/packages/make.htm)
+* [Make](https://winlibs.com)
+* [Ninja](https://ninja-build.org)
+* For Linux (apt): `apt install cmake ninja-build`
