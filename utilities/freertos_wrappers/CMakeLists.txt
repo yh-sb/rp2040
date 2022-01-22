@@ -7,5 +7,5 @@ target_include_directories(freertos_wrappers
 
 target_link_libraries(freertos_wrappers
     INTERFACE
-        freertos
+        freertos_kernel
 )

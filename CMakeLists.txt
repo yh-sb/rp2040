@@ -32,9 +32,10 @@ pico_sdk_init()
 
 add_subdirectory(third_party/FatFs)
 
-set(FREERTOS_PORT_GCC_RP2040 ON)
+set(FREERTOS_PORT GCC_RP2040 CACHE STRING "")
 set(FREERTOS_CONFIG_FILE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} CACHE STRING "")
 add_subdirectory(third_party/FreeRTOS-Kernel)
+
 add_subdirectory(third_party/printf)
 
 #add_subdirectory(utilities/fatfs_diskio)
@@ -48,7 +49,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
     #drivers
     #periph
     #fatfs_diskio
-    freertos
+    freertos_kernel
     fatfs
     printf
     syslog

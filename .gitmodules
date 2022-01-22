@@ -3,4 +3,4 @@
 	url = https://github.com/raspberrypi/pico-sdk.git
 [submodule "third_party/FreeRTOS-Kernel"]
 	path = third_party/FreeRTOS-Kernel
-	url = https://github.com/yhsb2k/FreeRTOS-Kernel.git
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git

@@ -9,7 +9,7 @@ target_include_directories(syslog
 
 target_link_libraries(syslog
     PUBLIC
-        freertos
+        freertos_kernel
     PRIVATE
         printf
 )
