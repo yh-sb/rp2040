@@ -3,7 +3,7 @@ name: build
 on: [push, pull_request]
 
 env:
-  GCC_ARM_NONE_EABI_VERSION: 10.3-2021.10
+  gcc_arm_version: 10.3-2021.10
 
 jobs:
   build-windows:
@@ -11,13 +11,14 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-            [System.Net.WebClient]::new().downloadFile("https://developer.arm.com/-/media/Files/downloads/gnu-rm/$Env:GCC_ARM_NONE_EABI_VERSION/gcc-arm-none-eabi-$Env:GCC_ARM_NONE_EABI_VERSION-win32.zip", "gcc-arm-none-eabi-win32.zip")
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\") | Remove-Item
-            echo "C:\gcc-arm-none-eabi-$Env:GCC_ARM_NONE_EABI_VERSION\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-            [System.Net.WebClient]::new().downloadFile("https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip", "ninja-win.zip")
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("ninja-win.zip", "C:\ninja") | Remove-Item
-            echo "C:\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Installing GCC ARM none eabi
+          curl -L https://developer.arm.com/-/media/Files/downloads/gnu-rm/${{env.gcc_arm_version}}/gcc-arm-none-eabi-${{env.gcc_arm_version}}-win32.zip -o gcc-arm-none-eabi-${{env.gcc_arm_version}}-win32.zip
+          tar -xf gcc-arm-none-eabi-${{env.gcc_arm_version}}-win32.zip -C C:\
+          Add-Content $env:GITHUB_PATH "C:\gcc-arm-none-eabi-${{env.gcc_arm_version}}\bin"
+          # Installing Ninja
+          curl -L https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip -o ninja-win.zip
+          tar -xf ninja-win.zip -C C:\ninja
+          Add-Content $env:GITHUB_PATH "C:\ninja"
 
       - name: Checkout with submodules
         uses: actions/checkout@v2
@@ -25,18 +26,39 @@ jobs:
           submodules: recursive
 
       - name: Build
-        run: make
+        run: |
+          cmake . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build -j
+
+      - name: Set artifacts suffix (if tag)
+        if: startsWith(github.ref, 'refs/tags/') == true
+        run: Add-Content $env:GITHUB_ENV "git_suffix=$(git describe --tags --abbrev=0)"
+
+      - name: Set artifacts suffix (if branch)
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: Add-Content $env:GITHUB_ENV "git_suffix=$(Write-Output "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)")"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rp2040-${{env.git_suffix}}
+          path: |
+            build/rp2040.bin
+            build/rp2040.dis
+            build/rp2040.elf.map
+            build/rp2040.hex
+            build/rp2040.uf2
+          if-no-files-found: error
 
   build-linux:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
         run: |
-            wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/$GCC_ARM_NONE_EABI_VERSION/gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2
-            sudo tar xjf gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2 -C /usr/share/
-            rm gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION-x86_64-linux.tar.bz2
-            echo "/usr/share/gcc-arm-none-eabi-$GCC_ARM_NONE_EABI_VERSION/bin" >> $GITHUB_PATH
-            sudo apt update && sudo apt install ninja-build
+          wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/$gcc_arm_version/gcc-arm-none-eabi-$gcc_arm_version-x86_64-linux.tar.bz2
+          sudo tar -xjf gcc-arm-none-eabi-$gcc_arm_version-x86_64-linux.tar.bz2 -C /usr/share/
+          echo "/usr/share/gcc-arm-none-eabi-$gcc_arm_version/bin" >> $GITHUB_PATH
+          sudo apt update && sudo apt install ninja-build
 
       - name: Checkout with submodules
         uses: actions/checkout@v2
@@ -44,4 +66,6 @@ jobs:
           submodules: recursive
 
       - name: Build
-        run: make
+        run: |
+          cmake . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build -j
