@@ -5,13 +5,8 @@
         {
             "label": "make",
             "type": "shell",
-            "windows": {"command": "make"},
-            "linux": {"command": "make"},
-            "presentation":
-            {
-                "reveal": "silent",
-                "showReuseMessage": false
-            }
+            "command": "make",
+            "presentation": { "showReuseMessage": false, "clear": true }
         },
         {
             "label": "gdbserver",
@@ -19,11 +14,7 @@
             "windows": {"command": "start make debug"},
             "linux": {"command": "make debug &"},
             "dependsOn": ["make"],
-            "presentation":
-            {
-                "reveal": "silent",
-                "showReuseMessage": false
-            }
+            "presentation": { "showReuseMessage": false, "clear": true }
         }
     ]
 }

@@ -3,15 +3,17 @@
     "configurations":
     [
         {
-            "name": "arm",
+            "name": "ARM",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/${workspaceFolderBasename}.elf",
+            "program": "${workspaceFolder}/build/rp2040.elf",
+            "cwd": "${workspaceFolder}/build",
             "miDebuggerPath": "arm-none-eabi-gdb",
-            "cwd": "${workspaceFolder}",
             "externalConsole": true,
             "internalConsoleOptions": "neverOpen",
             "preLaunchTask": "gdbserver",
+            "showDisplayString": true,
+            "visualizerFile": "${workspaceFolder}/.vscode/stl.gcc.natvis",
             "setupCommands":
             [
                 {
