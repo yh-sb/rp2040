@@ -7,6 +7,8 @@ BUILD_TYPE ?= Debug
 .PHONY: flash erase reset debug clean
 
 all:
+	$(eval export CC = clang)
+	$(eval export CXX = clang++)
 	cmake . -B$(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	cmake --build $(BUILD_DIR) -j
 
