@@ -1,7 +1,6 @@
 // Example for Raspberry Pi RP2040
 
 #include <stdio.h>
-#include "pico/stdio_uart.h"
 #include "periph/gpio.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -19,9 +18,6 @@ static void heartbeat_task(void *pvParameters)
 
 int main()
 {
-    stdio_uart_init();
-    printf("Hello, world!\n");
-
     xTaskCreate(heartbeat_task, "heartbeat", configMINIMAL_STACK_SIZE,
         nullptr, 1, nullptr);
     vTaskStartScheduler();

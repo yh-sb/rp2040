@@ -11,24 +11,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Cache Arm GNU Toolchain
+      - name: Cache Arm GNU Toolchain and Ninja
         uses: actions/cache@v3
         id: cache
         with:
           key: ${{ runner.OS }}-cache-${{ hashFiles('.github/workflows/build.yml') }}
-          path: C:\arm-gnu-toolchain
+          path: |
+            C:\arm-gnu-toolchain
+            C:\ninja
 
       - name: Install Arm GNU Toolchain
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          curl.exe -L https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-mingw-w64-i686-arm-none-eabi.zip -o arm-gnu-toolchain.zip
+          curl.exe -L https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip -o arm-gnu-toolchain.zip
           mkdir C:\arm-gnu-toolchain
           tar -xf arm-gnu-toolchain.zip -C C:\arm-gnu-toolchain --strip-components=1
 
+      - name: Install Ninja
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl.exe -L https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip -o ninja-win.zip
+          mkdir C:\ninja
+          tar -xf ninja-win.zip -C C:\ninja
+
       - name: Build
         run: |
-          # Set environment variables for Arm GNU Toolchain restored from GitHub cache
-          $env:Path = "C:\arm-gnu-toolchain\bin;" + $env:Path
+          # Set environment variables for Arm GNU Toolchain and Ninja restored from GitHub cache
+          $env:Path = "C:\arm-gnu-toolchain\bin;C:\ninja;" + $env:Path
           make
 
       - name: Set artifacts suffix (if tag)
@@ -69,7 +78,7 @@ jobs:
       - name: Install Arm GNU Toolchain
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          curl -L https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz -o arm-gnu-toolchain.tar.xz
+          curl -L https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.xz -o arm-gnu-toolchain.tar.xz
           mkdir ~/arm-gnu-toolchain
           tar -xf arm-gnu-toolchain.tar.xz -C ~/arm-gnu-toolchain --strip-components=1
 

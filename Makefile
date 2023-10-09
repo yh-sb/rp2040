@@ -4,7 +4,7 @@
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
 
-.PHONY: flash erase reset debug clean
+.PHONY: flash flash2 erase reset debug clean
 
 all:
 	$(eval export CC = clang)
@@ -12,7 +12,7 @@ all:
 	cmake . -B$(BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	cmake --build $(BUILD_DIR) -j
 
-flash erase reset debug:
+flash flash2 erase reset debug:
 	cmake --build $(BUILD_DIR) --target $@
 
 clean:
