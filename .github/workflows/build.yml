@@ -36,7 +36,6 @@ jobs:
 
       - name: Build
         run: |
-          # Set environment variables for Arm GNU Toolchain and Ninja restored from GitHub cache
           $env:Path = "C:\arm-gnu-toolchain\bin;C:\ninja;" + $env:Path
           make
 

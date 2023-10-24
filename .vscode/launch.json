@@ -3,26 +3,24 @@
     "configurations":
     [
         {
-            "name": "ARM",
+            "name": "RP2040",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/rp2040.elf",
             "cwd": "${workspaceFolder}/build",
+            "internalConsoleOptions": "neverOpen",
             "miDebuggerPath": "arm-none-eabi-gdb",
-            "externalConsole": true,
-            "preLaunchTask": "gdbserver",
+            //"preLaunchTask": "make and hide terminal",
             "showDisplayString": true,
             "visualizerFile": "${workspaceFolder}/.vscode/stl.gcc.natvis",
-            "setupCommands":
+            "debugServerPath": "JLinkGDBserverCL",
+            "debugServerArgs": "-device RP2040_M0_0 -if SWD -speed auto -strict -nogui -singlerun",
+            "serverStarted":"Connected to target",
+            "postRemoteConnectCommands":
             [
-                {
-                    "description": "Connect GDB to GDB server",
-                    "text": "target remote localhost:2331"
-                },
-                {
-                    "description": "Reset target to get to a known state",
-                    "text": "monitor reset"
-                }
+                { "text": "target remote localhost:2331" },
+                { "text": "load" },
+                { "text": "monitor reset" }
             ]
         }
     ]

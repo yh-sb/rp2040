@@ -30,7 +30,8 @@ pico_sdk_init()
 add_subdirectory(third_party/FatFs)
 
 set(FREERTOS_PORT GCC_RP2040 CACHE STRING "")
-set(FREERTOS_CONFIG_FILE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} CACHE STRING "")
+add_library(freertos_config INTERFACE)
+target_include_directories(freertos_config SYSTEM INTERFACE .)
 add_subdirectory(third_party/FreeRTOS-Kernel)
 
 add_subdirectory(third_party/printf)
@@ -73,7 +74,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 add_custom_target(flash2
     COMMENT "Copy .uf2 file to the bootloader RPI-RP2 disk"
     COMMAND powershell -Command "$rp2040Drive = (Get-WmiObject -Query 'Select * From Win32_LogicalDisk Where VolumeName=''RPI-RP2''').DeviceID; if (-not $rp2040Drive) { Write-Error 'RPI-RP2 disk not found'; exit 1; }; Copy-Item -Path ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.uf2 -Destination $rp2040Drive"
-    VERBATIM
+    VERBATIM USES_TERMINAL
 )
 
 # Add targets for flashing, erasing, resetting and debugging
